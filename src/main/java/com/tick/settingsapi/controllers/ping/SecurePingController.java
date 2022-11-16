@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/v1/secure/ping")
+@RequestMapping("api/v1/settings/secure/ping")
 public class SecurePingController {
 
     @GetMapping
