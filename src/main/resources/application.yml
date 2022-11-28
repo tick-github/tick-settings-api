@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: settings
+  data:
+    mongodb:
+      host: settings-db
+      port: 27017 # default mongo port
+      database: settings
 
 eureka:
   client:
