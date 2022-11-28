@@ -6,6 +6,7 @@ import com.tick.settingsapi.models.SettingsModel;
 import com.tick.settingsapi.repositories.SettingsRepository;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,6 +58,29 @@ public class SettingsController {
                         .data(newSettings)
                         .build()
         );
+    }
+
+    @GetMapping public ResponseEntity<Response> get(@RequestHeader("id") String userId) {
+
+        var settings = _repository.findById(userId);
+
+        if (settings.isEmpty()) {
+            log.warn(String.format(
+                    "%s\tTried to get Settings object for user %s but found no match.", LocalDateTime.now(), userId)
+            );
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    Response.builder()
+                        .message(String.format("Could not find settings for user %s.", userId))
+                        .build()
+            );
+        }
+
+        return ResponseEntity.ok().body(
+                Response.builder()
+                        .data(settings)
+                        .build()
+        );
+
     }
 
 }
