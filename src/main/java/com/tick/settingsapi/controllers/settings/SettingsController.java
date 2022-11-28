@@ -26,6 +26,7 @@ public class SettingsController {
     @PostMapping public ResponseEntity<Response> create(
             @RequestHeader("id") String userId, @RequestBody SettingsDTO request) {
 
+        log.info(String.format("%s\tReceived request to create settings for user %s.", LocalDateTime.now(), userId));
         var alreadyPresent =
                 _repository.findById(userId).isPresent();
 
@@ -62,6 +63,7 @@ public class SettingsController {
 
     @GetMapping public ResponseEntity<Response> get(@RequestHeader("id") String userId) {
 
+        log.info(String.format("%s\tReceived request to get settings for user %s.", LocalDateTime.now(), userId));
         var settings = _repository.findById(userId);
 
         if (settings.isEmpty()) {
@@ -75,12 +77,13 @@ public class SettingsController {
             );
         }
 
+        log.info(String.format("%s\tResponded to request for settings for user %s.", LocalDateTime.now(), userId));
+
         return ResponseEntity.ok().body(
                 Response.builder()
                         .data(settings)
                         .build()
         );
-
     }
 
 }
