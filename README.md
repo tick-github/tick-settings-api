@@ -108,6 +108,6 @@ When the services have started up, you will be able to verify the statuses on `h
 
 When you run the API, all endpoints can be access from the gateway url. By default, the Gateway is located at http://localhost:8000/
 
-To see the API documentation, open `./docs/index.html` in your web browser.
+To see the API documentation, open `./docs/index.html` in your web browser. Alternatively, you can past the contents of `./docs/contract.yml` to the site https://editor-next.swagger.io/.
 
 This API is meant to be run through the gateway. All endpoints, excluding the insecure `Ping` endpoint, require an authorization header with a valid Google ID token (JWT). The gateway requires a stable internet connection for validating the ID token.
