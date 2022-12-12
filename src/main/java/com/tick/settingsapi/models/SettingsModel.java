@@ -1,14 +1,13 @@
 package com.tick.settingsapi.models;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Builder
+@Setter
 @Getter
 public class SettingsModel {
 
