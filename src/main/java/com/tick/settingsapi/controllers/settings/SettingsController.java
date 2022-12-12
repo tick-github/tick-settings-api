@@ -5,6 +5,10 @@ import com.tick.settingsapi.models.Response;
 import com.tick.settingsapi.models.SettingsModel;
 import com.tick.settingsapi.repositories.SettingsRepository;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +25,18 @@ public class SettingsController {
         this._repository = repository;
     }
 
+    @ApiOperation(value = "Creates a Settings Object for a specific user.", response = Response.class)
+    @ApiResponses({
+            @ApiResponse(code = 200, message = ""),
+            @ApiResponse(code = 400, message = "Settings object of user %s already exists."),
+            @ApiResponse(code = 401, message = "Authorization header is invalid"),
+            @ApiResponse(code = 403, message = "Authorization header is missing in request")
+    })
     @PostMapping public ResponseEntity<Response> create(
-            @RequestHeader("id") String userId, @RequestBody SettingsDTO request) {
+            @ApiParam(value = "The user's sub identifier grabbed from a valid Google ID Token.", required = true)
+            @RequestHeader("id") String userId,
+            @ApiParam(value = "The details of the Settings Object to add.", required = true)
+            @RequestBody SettingsDTO request) {
 
         log.info(String.format("Received request to create settings for user %s.", userId));
         var alreadyPresent =
@@ -59,7 +73,16 @@ public class SettingsController {
         );
     }
 
-    @GetMapping public ResponseEntity<Response> get(@RequestHeader("id") String userId) {
+    @ApiOperation(value = "Gets a Settings Object for a specific user.", response = Response.class)
+    @ApiResponses({
+            @ApiResponse(code = 200, message = ""),
+            @ApiResponse(code = 401, message = "Authorization header is invalid"),
+            @ApiResponse(code = 403, message = "Authorization header is missing in request"),
+            @ApiResponse(code = 404, message = "Could not find settings for user %s.")
+    })
+    @GetMapping public ResponseEntity<Response> get(
+            @ApiParam(value = "The user's sub identifier grabbed from a valid Google ID Token.", required = true)
+            @RequestHeader("id") String userId) {
 
         log.info(String.format("Received request to get settings for user %s.", userId));
         var settings = _repository.findById(userId);
@@ -82,6 +105,46 @@ public class SettingsController {
                         .data(settings)
                         .build()
         );
+    }
+
+    @ApiOperation(value = "Updates a Settings Object for a specific user.", response = Response.class)
+    @ApiResponses({
+            @ApiResponse(code = 200, message = ""),
+            @ApiResponse(code = 401, message = "Authorization header is invalid"),
+            @ApiResponse(code = 403, message = "Authorization header is missing in request"),
+            @ApiResponse(code = 404, message = "Could not find settings for user %s.")
+    })
+    @PutMapping public ResponseEntity<Response> update(
+            @ApiParam(value = "An object containing the updated SettingsDTO object.", required = true)
+            @RequestBody SettingsDTO request,
+            @ApiParam(value = "The user's sub identifier grabbed from a valid Google ID Token.", required = true)
+            @RequestHeader("id") String userId) {
+
+        log.info(String.format("Received request to update settings for user %s.", userId));
+
+        if (_repository.findById(userId).isEmpty()) {
+            log.warn(String.format(
+                    "Tried to get Settings object for user %s but found no match.", userId)
+            );
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    Response.builder()
+                            .message(String.format("Could not find settings for user %s.", userId))
+                            .build()
+            );
+        }
+
+        SettingsModel newSettings = SettingsModel.builder()
+                .userId(userId)
+                .primaryColor(request.primaryColor())
+                .secondaryColor(request.secondaryColor())
+                .tertiaryColor(request.tertiaryColor())
+                .locale(request.locale())
+                .weatherCity(request.weatherCity()).build();
+
+        var responseData = _repository.save(newSettings);
+        log.info(String.format("Updated settings for user %s.", userId));
+        return ResponseEntity.ok(Response.builder().data(responseData).build());
+
     }
 
 }
