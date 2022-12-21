@@ -108,53 +108,6 @@ When the services have started up, you will be able to verify the statuses on `h
 
 When you run the API, all endpoints can be access from the gateway url. By default, the Gateway is located at http://localhost:8000/
 
-## Insecure endpoints
+To see the API documentation, open `./docs/index.html` in your web browser. Alternatively, you can past the contents of `./docs/contract.yml` to the site https://editor-next.swagger.io/.
 
-### Ping
-
-**Request:**
-
-```http
-GET /api/v1/settings/ping
-```
-
-**Response:**
-
-```Pong!```
-
-**Status Codes:**
-
-| Status Code | Description             | Comment |
-| :---------: | :---------------------- | :------ | 
-| `200`       | `OK`                    |         |
-| `500`       | `INTERNAL SERVER ERROR` |         |
-| `503`       | `SERVICE UNAVAILABLE`   |         |
-
-## Secure endpoints
-
-### Ping
-
-**Request:**
-
-```http
-GET /api/v1/settings/secure/ping
-Authorization: {GOOGLE_JWT}
-```
-
-To request this resource, you need to append a valid Google Account ID token as an Authorization header to your GET request.
-
-**Response:**
-
-```Pong! Thank you for verifying your identity, {NAME}!```
-
-The `{NAME}` is gathered from the ID token you provided with your request.
-
-**Status Codes:**
-
-| Status Code | Description             | Comment |
-| :---------: | :---------------------- | :------ | 
-| `200`       | `OK`                    |         |
-| `401`       | `UNAUTHORIZED`          | The authorization header is missing. |
-| `403`       | `FORBIDDEN`             | The authorization header token is invalid. |
-| `500`       | `INTERNAL SERVER ERROR` |         |
-| `503`       | `SERVICE UNAVAILABLE`   |         |
+This API is meant to be run through the gateway. All endpoints, excluding the insecure `Ping` endpoint, require an authorization header with a valid Google ID token (JWT). The gateway requires a stable internet connection for validating the ID token.

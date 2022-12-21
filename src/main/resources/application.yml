@@ -1,9 +1,14 @@
 server:
-  port: 0 # assigns random port to instances of Settings API
+  port: 9999 # assigns random port to instances of Settings API
 
 spring:
   application:
     name: settings
+  data:
+    mongodb:
+      host: settings-db
+      port: 27017 # default mongo port
+      database: settings
 
 eureka:
   client:

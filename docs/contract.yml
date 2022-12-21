@@ -1,0 +1,172 @@
+openapi: 3.0.0
+info:
+  title: Settings API
+  description: An API to manage user-related settings of the Tick Dashboard.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000/api/v1/settings
+    description: The Gateway endpoint for reaching the Settings API.
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+  responses:
+    UnauthorizedError:
+      description: Google ID token is invalid.
+      headers:
+        Authorization:
+          description: A valid Google ID token (JWT).
+          schema:
+            type: string
+    ForbiddenError:
+      description: Google ID token is missing.
+      headers:
+        Authorization:
+          description: A valid Google ID token (JWT).
+          schema:
+            type: string
+  schemas:
+    SettingsModel:
+      type: object
+      properties:
+        userId:
+          type: string
+        primaryColor:
+          type: string
+        secondaryColor:
+          type: string
+        tertiaryColor:
+          type: string
+        locale:
+          type: string
+        weatherCity:
+          type: string
+    SettingsResponse:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/SettingsModel"
+        message:
+          type: string
+    SettingsDTO:
+      type: object
+      properties:
+        primaryColor:
+          type: string
+        secondaryColor:
+          type: string
+        tertiaryColor:
+          type: string
+        locale:
+          type: string
+        weatherCity:
+          type: string
+paths:
+  /ping:
+    get:
+      summary: Returns a heartbeat.
+      tags:
+        - ping
+      description: Checks the heartbeat of the Settings API via an insecure route.
+      responses:
+        '200':
+          description: Pong!
+          content:
+            text/plain:
+              schema:
+                type: string
+  /secure/ping:
+    get:
+      summary: Returns a heartbeat.
+      tags:
+        - ping
+      description: Checks the heartbeat of the Settings API via a secure route.
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Pong!
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '403':
+          $ref: "#/components/responses/ForbiddenError"
+  /:
+    get:
+      summary: Returns a Settings Object for a specific user.
+      tags:
+        - settings
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: A Settings Object for the specified user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SettingsResponse"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '403':
+          $ref: "#/components/responses/ForbiddenError"
+        '404':
+          description: Could not find the settings for the user.
+    post:
+      summary: Creates a Settings Object for a specific user.
+      tags:
+        - settings
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        description: The SettingsDTO containing the settings
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingsDTO"
+      responses:
+        '200':
+          description: The created Settings Object for the specified user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SettingsResponse"
+        '400':
+          description: The Settings Object already exists for the specified user.
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '403':
+          $ref: "#/components/responses/ForbiddenError"
+    put:
+      summary: Updates a Settings Object for a specific user.
+      tags:
+        - settings
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        description: The SettingsDTO containing the settings
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SettingsDTO"
+      responses:
+        '200':
+          description: The updated Settings Object for the specified user.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SettingsResponse"
+        '401':
+          $ref: "#/components/responses/UnauthorizedError"
+        '403':
+          $ref: "#/components/responses/ForbiddenError"
+        '404':
+          description: Could not find the settings for the specified user.
